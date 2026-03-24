@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAZN Sharing Rules Creator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-mark">
+      <!-- replace with your own logo file or URL -->
+      <img src="daznLogo.png" alt="DAZN" class="logo-img">
+    </div>
+    <div class="logo-text">DAZN <span>Sharing Rules</span> Creator</div>
+  </div>
+  <div class="header-actions">
+    <span class="tag">v1.0</span>
+    <button class="btn btn-ghost" onclick="clearAll()">↺ Reset</button>
+    <button class="btn btn-success" onclick="exportTSV()">⬇ Export TSV</button>
+    <button class="btn btn-accent" onclick="exportXLSX()">⬇ Export XLSX</button>
+  </div>
+</header>
+
+<!-- Main Layout -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-scroll">
+
+      <!-- Owner Config -->
+      <div class="sidebar-section">
+        <div class="section-label">Owner</div>
+        <div class="form-group">
+          <label>Owner Name</label>
+          <input type="text" id="ownerName" value="DAZN Global" placeholder="DAZN Global">
+        </div>
+        <div class="form-group">
+          <label>Competition IDs <span style="color:var(--text-dim)">(one per line)</span></label>
+          <textarea class="comp-ids-area" id="compIds" placeholder="4x9xyyv419q82evpbl37j77gt&#10;bqvy41un7sf86rbse9tv810x7&#10;..." rows="4" oninput="updateCompCount()"></textarea>
+          <div class="comp-count" id="compCount">0 IDs entered</div>
+        </div>
+      </div>
+
+      <!-- Per-Recipient Language Config -->
+      <div class="sidebar-section" id="recipientLangSection">
+        <div class="section-label">Recipient Languages</div>
+        <div class="quick-actions">
+          <button class="quick-btn" onclick="selectAllLangs()">Enable All</button>
+          <button class="quick-btn" onclick="clearLangs()">Disable All</button>
+        </div>
+        <div id="recipientLangConfig"></div>
+      </div>
+
+      <!-- Statuses -->
+      <div class="sidebar-section">
+        <div class="section-label">Owner Status</div>
+        <div style="display:flex;gap:8px;">
+          <label class="checkbox-row" style="flex:1;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
+            <input type="checkbox" id="statusLive" checked>
+            <span>LIVE</span>
+          </label>
+          <label class="checkbox-row" style="flex:1;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
+            <input type="checkbox" id="statusScheduled" checked>
+            <span>SCHEDULED</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Article Types -->
+      <div class="sidebar-section">
+        <div class="section-label">Article Types</div>
+        <div class="article-type-grid" id="articleTypeGrid"></div>
+      </div>
+
+      <!-- Category Mapping -->
+      <div class="sidebar-section">
+        <div class="section-label" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>Category Mapping</span>
+          <span style="color:var(--text-dim);font-size:9px;letter-spacing:0.05em;font-family:DM Mono,monospace;">OWNER → RECIPIENT</span>
+        </div>
+        <div class="quick-actions">
+          <button class="quick-btn" onclick="selectAllCats()">Enable All</button>
+          <button class="quick-btn" onclick="clearCats()">Disable All</button>
+          <button class="quick-btn" onclick="resetCatMappings()">Reset</button>
+        </div>
+        <div id="catMappingList"></div>
+      </div>
+
+      <!-- Recipients -->
+      <div class="sidebar-section">
+        <div class="section-label">Recipients</div>
+        <div class="quick-actions">
+          <button class="quick-btn" onclick="selectAllRecipients()">All</button>
+          <button class="quick-btn" onclick="clearRecipients()">None</button>
+        </div>
+        <div class="recipient-grid" id="recipientGrid"></div>
+      </div>
+
+
+    </div><!-- end sidebar-scroll -->
+
+    <!-- Generate button -->
+    <div class="sidebar-bottom">
+      <button class="btn btn-accent" style="width:100%;justify-content:center;padding:12px;" onclick="generateRules()">
+        ▶ Generate Rules
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Preview header -->
+    <div class="preview-header">
+      <div>
+        <div class="preview-title">Rules Preview</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat">Competitions: <span class="stat-val" id="statComps">0</span></div>
+        <div class="stat">Recipients: <span class="stat-val" id="statRecipients">0</span></div>
+        <div class="stat">Rules/Comp: <span class="stat-val" id="statPerComp">0</span></div>
+        <div class="stat">Total Rows: <span class="stat-val" id="statTotal">0</span></div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper" id="tableWrapper">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">⚙</div>
+        <h3>No rules generated yet</h3>
+        <p>Configure your sharing rules in the left panel, then click <strong>Generate Rules</strong> to preview them here.</p>
+      </div>
+    </div>
+
+    <!-- Export bar -->
+    <div class="export-bar" id="exportBar" style="display:none;">
+      <div class="export-info">
+        <span>Owner: <strong id="exportOwner">—</strong></span>
+        <span>Format: <strong>Tab-Separated</strong></span>
+        <span>Rows: <strong id="exportRows">0</strong></span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" onclick="copyToClipboard()">⎘ Copy TSV</button>
+        <button class="btn btn-success" onclick="exportTSV()">⬇ Export TSV</button>
+        <button class="btn btn-accent" onclick="exportXLSX()">⬇ Export XLSX</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
