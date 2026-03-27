@@ -30,7 +30,8 @@ const DEFAULT_CAT_MAPPING = {
   "Courtside – Top Plays":         "Courtside – Top Plays",
   "Exclude from Core Rail":        "Exclude from Core Rail",
   "Exclude from Live and Next":    "Exclude from Live and Next",
-  "Extended Highlights":           "Extended Highlights"
+  "Extended Highlights":           "Extended Highlights",
+  "FIFA+ Content on DAZN Rails":   "FIFA+ Content on DAZN Rails"
 };
 
 // Mutable state: which cats are enabled + their recipient mapping
@@ -65,7 +66,8 @@ const CATEGORIES = [
   "Courtside – Top Plays",
   "Exclude from Core Rail",
   "Exclude from Live and Next",
-  "Extended Highlights"
+  "Extended Highlights",
+  "FIFA+ Content on DAZN Rails"
 ];
 
 // Each recipient's supported languages — owner must use these exact codes
