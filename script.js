@@ -233,6 +233,21 @@ function resetCatMappings() {
   showToast('✓ Mappings reset to defaults', 'success');
 }
 
+function addNewCategory() {
+  const newCat = prompt('Enter new category name:');
+  if (newCat && newCat.trim()) {
+    const trimmed = newCat.trim();
+    if (CATEGORIES.includes(trimmed)) {
+      showToast('⚠ Category already exists', 'error');
+      return;
+    }
+    CATEGORIES.push(trimmed);
+    catState[trimmed] = { enabled: true, recipientCat: trimmed };
+    renderCatMappingList();
+    showToast('✓ Category added', 'success');
+  }
+}
+
 function renderCatMappingList() {
   const container = document.getElementById('catMappingList');
   if (!container) return;
