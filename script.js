@@ -41,7 +41,7 @@ const ARTICLE_TYPES = ["All","Live - Catch Up","Live - Highlights","Shoulder","F
 
 const CATEGORIES = [
   "Football Archive",
-  "Exclude from What's On",
+  "Exclude from What’s On",
   "Exclude from epg",
   "Freemium",
   "Play4Free",
@@ -190,6 +190,11 @@ function clearLangs() {
 function getSelectedCats() {
   return CATEGORIES.filter(c => catState[c] && catState[c].enabled);
 }
+
+function normalizeCurlyApostrophes(value) {
+  return String(value).replace(/'/g, '’');
+}
+
 function getRecipientCatFor(ownerCat) {
   return (catState[ownerCat] && catState[ownerCat].recipientCat) || ownerCat;
 }
@@ -236,7 +241,7 @@ function resetCatMappings() {
 function addNewCategory() {
   const newCat = prompt('Enter new category name:');
   if (newCat && newCat.trim()) {
-    const trimmed = newCat.trim();
+    const trimmed = normalizeCurlyApostrophes(newCat.trim());
     if (CATEGORIES.includes(trimmed)) {
       showToast('⚠ Category already exists', 'error');
       return;
@@ -441,12 +446,13 @@ function renderTable(owner, compIds, recipients) {
 
 // ===== EXPORT =====
 function rowsToTSV() {
-  return [HEADER.join('\t'), ...generatedRows.map(r => r.join('\t'))].join('\n');
+  return [HEADER.join('\t'), ...generatedRows.map(r => r.map(normalizeCurlyApostrophes).join('\t'))].join('\n');
 }
 
 function exportTSV() {
   if (!generatedRows.length) { showToast('Generate rules first', 'error'); return; }
-  const blob = new Blob([rowsToTSV()], { type: 'text/tab-separated-values' });
+  const tsv = '\uFEFF' + rowsToTSV();
+  const blob = new Blob([tsv], { type: 'text/tab-separated-values;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url;
   a.download = `DAZN_Sharing_Rules_${Date.now()}.tsv`;
@@ -462,8 +468,8 @@ function copyToClipboard() {
 function exportXLSX() {
   if (!generatedRows.length) { showToast('Generate rules first', 'error'); return; }
   const rows = [HEADER, ...generatedRows];
-  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
+  const csv = rows.map(r => r.map(c => `"${normalizeCurlyApostrophes(String(c)).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url;
   a.download = `DAZN_Sharing_Rules_${Date.now()}.csv`;
