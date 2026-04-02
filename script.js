@@ -5,7 +5,7 @@
 // Default category mapping: owner cat -> recipient cat (same by default, B2C special case handled separately)
 const DEFAULT_CAT_MAPPING = {
   "Football Archive":          "Football Archive",
-  "Exclude from What's On":    "Exclude from What's On",
+  "Exclude from What’s On":    "Exclude from What’s On",
   "Exclude from epg":          "Exclude from epg",
   "Freemium":                  "Freemium",
   "Play4Free":                 "Play4Free",
